@@ -1,0 +1,16 @@
+JAVA开发工程师
+
+职位描述：
+工作职责：
+1.	负责功能模块的设计、开发，负责单元测试用例的设计、开发；
+2.	整理详细功能流程图、类图；
+3.	编写软件详细设计文档；
+4.	调试、修复系统疑难问题。
+
+任职要求：
+1.	具有3-5年Java 系统开发经验，Java 基础扎实，熟悉Java 多线程开发，有并发处理开发经验；
+2.	熟练掌握 Web Service 开发技术
+3.	熟练掌握 Servlet 原理，精通 Spring、Spring MVC、Spring Security、Spring Data、Hibernate(JPA)、Mybaitis 等开源框架；
+4.	熟悉 Oracle或Mysql、NoSql 数据库的使用，掌握SQL 操作和调优；
+5.	了解Web 应用前端展现技术，有基本的JS、CSS、HTML开发经验；
+6.	良好的沟通能力和团队合作精神；
