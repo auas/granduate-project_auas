@@ -38,10 +38,12 @@ def PCA(X,y):
     # print(np.array(X_new).shape)
     # exit(111)
     data_idx_lst = list(set(y))
-
+    c = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
+    s = ["*","o"]
     for data_idx in data_idx_lst:
-        plt.scatter(X_new[y==data_idx, 0], X_new[y==data_idx, 1],label=str(data_idx),
-                    color=1./data_idx)
+        plt.scatter(X_new[y==data_idx, 0], X_new[y==data_idx, 1],
+                    c=c[int(data_idx%8)],label=str(data_idx),
+                    s=80,marker = s[int(data_idx%2)])
     plt.legend(loc = "best")
     plt.show()
 # PCA(np.concatenate([tr,tst]))

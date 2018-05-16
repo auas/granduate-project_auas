@@ -1,4 +1,7 @@
 import numpy as np
+import matplotlib.pyplot as plt
+plt.scatter(x, x*idx,c=c[int(data_idx%8)],label=str(data_idx))
+exit(666)
 import theano.tensor as tt
 import pymc3 as pm
 
