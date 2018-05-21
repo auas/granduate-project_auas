@@ -18,6 +18,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import operator
 import math
+import keras
+from keras.layers import Input, Dense
+import random
+random.seed(233)
 root_dir = r"C:/Users/auas/Desktop/auas/大四/毕设/结题/code/key_word/"
 data_root =  r"C:/Users/auas/Desktop/auas/大四/毕设/结题/data/"
 class raw_corpus_loader(object):
@@ -347,4 +351,112 @@ def save_onehot_vec_final(spath = root_dir+"/data/onehot_vec_matched_final.pkl")
     s_data["y"] = np.array(y)
     pickle.dump(s_data,sf)
 
-save_onehot_vec_final()
+# save_onehot_vec_final()
+
+def build_training_data_onehot(spath = root_dir+"/data/onehot_match_0521.pkl"):
+    f = open(data_root + "sorted_data_final.pkl", "rb")
+    raw_data = pickle.load(f)
+    f.close()
+    keyword_path = root_dir + "key_word.txt"
+    auas_doc2vec = doc2key_vec(keyword_path)
+    ret = {}
+    for data_idx in raw_data:
+        if data_idx not in ret:
+            ret[data_idx] = {}
+            ret[data_idx]["JD"] = ""
+            ret[data_idx]["JL"] = []
+        JL = raw_data[data_idx]["JL"]
+        a_jd = raw_data[data_idx]["JD"]
+        vec_jd = auas_doc2vec.doc2vec(a_jd)
+        ret[data_idx]["JD"] = vec_jd
+        for idx,a_jl in enumerate(JL):
+            vec = auas_doc2vec.doc2vec(a_jl)
+            ret[data_idx]["JL"].append(vec)
+            # jd.append(vec_jd)
+            # x.append(vec)
+            # y.append(data_idx)
+    sf = open(spath,"wb")
+    pickle.dump(ret,sf)
+
+# build_training_data_onehot()
+def get_encoder():
+    from auto_encoder import build_encoder
+    tr_model, test_model_ = build_encoder()
+    tr_model.load_weights("encoder.checkpointer.hdf5")
+    encoder = tr_model.layers[3].output
+    input_arr = tr_model.input
+    test_model = keras.models.Model(input_arr, encoder)
+    return test_model
+def build_training_data_final(rpath = root_dir+"/data/onehot_match_0521.pkl"):
+    encoder = get_encoder()
+    print("encoder loaded")
+    tot_neg_data_num = 200
+    f = open(rpath,"rb")
+    raw_data = pickle.load(f)
+    f.close()
+    # generate positive data first
+    x = []
+    y = []
+    encode_raw_data = {}
+    for idx in raw_data:
+        if idx not in encode_raw_data:
+            encode_raw_data[idx] = {}
+        jd_vec = raw_data[idx]["JD"]
+        jl_vec_lst = raw_data[idx]["JL"]
+        encode_raw_data[idx]["JD"] = np.array(encoder.predict(np.array([jd_vec]).reshape([1,2055])))
+        encode_raw_data[idx]["JL"] = np.array(
+            [encoder.predict(it.reshape([1,2055])) for it in jl_vec_lst])
+        # print("~~~~~~~~~~~~~~~")
+        # print(encode_raw_data[idx]["JD"].shape)
+        # print(encode_raw_data[idx]["JL"].shape)
+        # exit(666)
+    encode_sf = open(root_dir+"/data/encode_matched_0521.pkl","wb")
+    pickle.dump(encode_raw_data,encode_sf)
+    encode_sf.close()
+    print("encoded data saved")
+    # now build data set for classification
+    for idx in encode_raw_data:
+        tmp_jd = encode_raw_data[idx]["JD"][0]
+        for tmp_jl in encode_raw_data[idx]["JL"]:
+            tmp_jl = tmp_jl.reshape((1,64))
+            tmp_jd = tmp_jd.reshape((1,64))
+            tmp = np.array([tmp_jd,tmp_jl])
+            # print(tmp)
+            # print(tmp.shape)
+            # exit(233)
+            # print(tmp.shape)
+            x.append(np.array([tmp_jd,tmp_jl]))
+            y.append(1)
+    for idx in range(tot_neg_data_num):
+        jd_idx = random.randint(0,len(list(encode_raw_data.keys()))-1)
+        jl_idx = random.randint(0,len(list(encode_raw_data.keys()))-1)
+        while jl_idx == jd_idx:
+            jl_idx = random.randint(0,len(list(encode_raw_data.keys()))-1)
+
+        jd_vec = encode_raw_data[jd_idx]["JD"][0].reshape((1,64))
+        jl_vec = random.choice(encode_raw_data[jl_idx]["JL"]).reshape((1,64))
+        print("!!!!!")
+        # print(jd_vec)
+        print(jd_vec.shape)
+        print(jl_vec.shape)
+        x.append(np.array([jd_vec,jl_vec]))
+        y.append(0)
+    idx_lst = list(range(len(x)))
+    random.shuffle(idx_lst)
+    x = np.array(x)
+    y = np.array(y)
+    x = x[idx_lst]
+    y = y[idx_lst]
+    f = open(data_root+"class_dataset.pkl","wb")
+    pickle.dump([x,y],f)
+    return [x,y]
+
+x,y = build_training_data_final()
+for idx in range(5):
+    tmp_x = x[idx]
+    print("#######")
+    # print(tmp_x)
+    print(y[idx])
+    print(tmp_x.shape)
+
+

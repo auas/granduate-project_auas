@@ -22,9 +22,9 @@ def build_encoder():
     test_model = keras.models.Model(input_arr,encoded)
     return model,test_model
 
-data = load_data(root_dir+"data/onehot_vec_matched_final.pkl")
-JL_vec = data["JL"]
-y = data["y"]
+# data = load_data(root_dir+"data/onehot_vec_matched_final.pkl")
+# JL_vec = data["JL"]
+# y = data["y"]
 def PCA(X,y):
     from sklearn.decomposition import PCA
     import numpy as np
@@ -48,20 +48,20 @@ def PCA(X,y):
     plt.show()
 # PCA(np.concatenate([tr,tst]))
 # exit(0)
-tr_model,test_model_ = build_encoder()
+# tr_model,test_model_ = build_encoder()
 # checkpointer = keras.callbacks.ModelCheckpoint(
 #     filepath="encoder.checkpointer.hdf5",
 #     verbose=1, save_best_only=True)
 # earlystopper = keras.callbacks.EarlyStopping(monitor='val_loss', patience=100, verbose=1)
-print("training")
+# print("training")
 # tr_model.fit(tr,tr,epochs=1000,batch_size=100, shuffle=True, validation_split=0.1,
 #                verbose=2,callbacks=[checkpointer,earlystopper])
-print("testing")
-tr_model.load_weights("encoder.checkpointer.hdf5")
-encoder = tr_model.layers[3].output
-input_arr = tr_model.input
-test_model = keras.models.Model(input_arr,encoder)
-pred = test_model.predict(JL_vec)
-
-PCA(pred,y)
-print(r[0])
+# print("testing")
+# tr_model.load_weights("encoder.checkpointer.hdf5")
+# encoder = tr_model.layers[3].output
+# input_arr = tr_model.input
+# test_model = keras.models.Model(input_arr,encoder)
+# pred = test_model.predict(JL_vec)
+#
+# PCA(pred,y)
+# print(r[0])
